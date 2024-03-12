@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libarchive
-PKG_VERSION:=3.5.2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=3.7.2
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://www.libarchive.org/downloads
-PKG_HASH:=f0b19ff39c3c9a5898a219497ababbadab99d8178acc980155c7e1271089b5a0
+PKG_HASH:=04357661e6717b6941682cde02ad741ae4819c67a260593dfb2431861b251acb
 
 PKG_MAINTAINER:=Johannes Morgenroth <morgenroth@ibr.cs.tu-bs.de>
 PKG_LICENSE:=BSD-2-Clause
@@ -34,6 +34,7 @@ endef
 define Package/libarchive
   $(call Package/libarchive/Default)
   DEPENDS += +libopenssl
+  CONFLICTS:=libarchive-noopenssl
 endef
 
 define Package/libarchive-noopenssl
@@ -71,32 +72,22 @@ define Package/bsdtar/description
 endef
 
 CMAKE_OPTIONS += \
-	-DENABLE_MBEDTLS=OFF \
-	-DENABLE_NETTLE=OFF \
 	-DENABLE_LIBB2=OFF \
 	-DENABLE_LZ4=OFF \
-	-DENABLE_LZO=OFF \
-	-DENABLE_LZMA=ON \
 	\
 	-DENABLE_ZSTD=OFF \
-	-DENABLE_ZLIB=ON \
-	-DENABLE_BZip2=ON \
 	-DENABLE_LIBXML2=OFF \
-	-DENABLE_EXPAT=ON \
 	-DENABLE_PCREPOSIX=OFF \
 	-DENABLE_LibGCC=OFF \
 	-DENABLE_CNG=OFF \
 	\
-	-DENABLE_TAR=ON \
 	-DENABLE_TAR_SHARED=ON \
 	-DENABLE_CPIO=OFF \
 	-DENABLE_CAT=OFF \
 	-DENABLE_XATTR=OFF \
 	-DENABLE_ACL=OFF \
 	-DENABLE_ICONV=OFF \
-	-DENABLE_TEST=OFF \
-	-DENABLE_COVERAGE=OFF \
-	-DENABLE_INSTALL=ON
+	-DENABLE_TEST=OFF
 
 ifeq ($(BUILD_VARIANT),noopenssl)
 	CMAKE_OPTIONS += -DENABLE_OPENSSL=OFF

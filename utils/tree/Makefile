@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tree
-PKG_VERSION:=2.0.2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.1.1
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/Old-Man-Programmer/$(PKG_NAME)/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=753af251ba6446f4d40cc00064e73c55e910d95245a23d63a31ae1f36d444c1f
+PKG_HASH:=1b70253994dca48a59d6ed99390132f4d55c486bf0658468f8520e7e63666a06
 
 PKG_MAINTAINER:=Banglang Huang <banglang.huang@foxmail.com>
 

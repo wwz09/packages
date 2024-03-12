@@ -9,10 +9,10 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=qemu
-PKG_VERSION:=6.2.0
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=8.2.0
+PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_HASH:=68e15d8e45ac56326e0b9a4afa8b49a3dfe8aba3488221d098c84698bca65b45
+PKG_HASH:=bf00d2fa12010df8b0ade93371def58e632cb32a6bfdc5f5a0ff8e6a1fb1bf32
 PKG_SOURCE_URL:=http://download.qemu.org/
 PKG_LICENSE:=GPL-2.0-only
 PKG_LICENSE_FILES:=LICENSE tcg/LICENSE
@@ -21,15 +21,15 @@ PKG_CPE_ID:=cpe:/a:qemu:qemu
 
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 PKG_BUILD_DEPENDS+=spice-protocol
 
 include $(INCLUDE_DIR)/nls.mk
 include $(INCLUDE_DIR)/package.mk
 
-QEMU_DEPS_IN_GUEST := @(TARGET_x86_64||TARGET_armvirt||TARGET_malta)
-QEMU_DEPS_IN_HOST := @(TARGET_x86_64||TARGET_sunxi)
+QEMU_DEPS_IN_GUEST := @(TARGET_x86_64||TARGET_armsr||TARGET_malta)
+QEMU_DEPS_IN_HOST := @(TARGET_x86_64||TARGET_armsr_armv8||TARGET_sunxi)
 QEMU_DEPS_IN_HOST += +libstdcpp
 QEMU_DEPS_IN_HOST += $(ICONV_DEPENDS)
 
@@ -63,8 +63,6 @@ define Package/qemu-ga/install
 	$(INSTALL_BIN) ./files/qemu-ga.init $(1)/etc/init.d/qemu-ga
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/virtio-ports
 	$(INSTALL_BIN) ./files/10-qemu-ga.hotplug $(1)/etc/hotplug.d/virtio-ports/10-qemu-ga
-	$(INSTALL_DIR) $(1)/sbin
-	$(INSTALL_BIN) ./files/shutdown $(1)/sbin/shutdown
 endef
 
 PKG_CONFIG_DEPENDS += CONFIG_PACKAGE_qemu-ga
@@ -93,7 +91,7 @@ define Package/qemu-img
  SUBMENU:=Virtualization
  TITLE:=QEMU Image utility
  URL:=http://www.qemu.org
- DEPENDS:=+glib2 $(QEMU_DEPS_IN_HOST)
+ DEPENDS:=+glib2 +QEMU_ZSTD:libzstd $(QEMU_DEPS_IN_HOST)
 endef
 
 define Package/qemu-img/install
@@ -108,7 +106,7 @@ define Package/qemu-nbd
  SUBMENU:=Virtualization
  TITLE:=QEMU Network Block Device Utility
  URL:=http://www.qemu.org
- DEPENDS:=+glib2 $(QEMU_DEPS_IN_HOST) +kmod-nbd
+ DEPENDS:=+glib2 +QEMU_ZSTD:libzstd $(QEMU_DEPS_IN_HOST) +kmod-nbd
 endef
 
 define Package/qemu-nbd/install
@@ -194,12 +192,13 @@ define qemu-target
     URL:=http://www.qemu.org
     DEPENDS:= +glib2 +libpthread +zlib +libbpf $(QEMU_DEPS_IN_HOST) $(qemu-target-$(1)-deps) \
 	+QEMU_UI_VNC:qemu-keymaps \
+	+QEMU_UI_VNC:libpng \
 	+QEMU_UI_VNC_JPEG:libjpeg \
-	+QEMU_UI_VNC_PNG:libpng \
 	+QEMU_UI_VNC_SASL:libsasl2 \
 	+QEMU_UI_SPICE:libspice-server \
 	+QEMU_DEV_USB:libusb-1.0 \
 	+QEMU_SECCOMP:libseccomp \
+	+QEMU_ZSTD:libzstd \
 	$(if $(filter %-softmmu,$(1)),+libncurses +libfdt +libslirp +libudev +pixman +qemu-firmware-efi $(ICONV_DEPENDS))
   endef
 
@@ -221,6 +220,7 @@ endef
 qemu-target-list :=	\
 	x86_64-softmmu	\
 	arm-softmmu	\
+	aarch64-softmmu \
 
 qemu-target-x86_64-softmmu-deps:= \
 	+qemu-firmware-pxe \
@@ -248,11 +248,6 @@ config QEMU_UI_VNC_JPEG
 	default n
 	depends on QEMU_UI_VNC
 
-config QEMU_UI_VNC_PNG
-	bool "QEMU VNC png tight encoding support"
-	default n
-	depends on QEMU_UI_VNC
-
 config QEMU_UI_VNC_SASL
 	bool "QEMU VNC SASL auth support"
 	default n
@@ -263,6 +258,7 @@ config QEMU_UI_SPICE
 
 config QEMU_DEV_USB
 	bool "QEMU USB passthrough support"
+	default y
 
 config QEMU_SECCOMP
 	bool "Enable support for seccomp in QEMU"
@@ -271,17 +267,21 @@ config QEMU_SECCOMP
 	  Build QEMU with support for seccomp filters.
 	  Select libseccomp which also pulls-in the needed kernel features.
 
+config QEMU_ZSTD
+	bool "QEMU ZSTD compression support"
+	default n
+
 endif
 endef
 
 PKG_CONFIG_DEPENDS += \
 	CONFIG_QEMU_UI_VNC \
 	CONFIG_QEMU_UI_VNC_JPEG \
-	CONFIG_QEMU_UI_VNC_PNG \
 	CONFIG_QEMU_UI_VNC_SASL \
 	CONFIG_QEMU_UI_SPICE \
 	CONFIG_QEMU_DEV_USB \
 	CONFIG_QEMU_SECCOMP \
+	CONFIG_QEMU_ZSTD \
 
 
 # QEMU configure script does not recognize these options
@@ -312,11 +312,8 @@ CONFIGURE_ARGS +=			\
 	--enable-vhost-crypto		\
 	--enable-vhost-kernel		\
 	--enable-vhost-net		\
-	--enable-vhost-scsi		\
 	--enable-vhost-user		\
-	--enable-vhost-user-fs		\
 	--enable-vhost-user-blk-server	\
-	--enable-vhost-vsock		\
 	--enable-vhost-vdpa		\
 
 # Image formats support
@@ -336,11 +333,9 @@ CONFIGURE_ARGS +=			\
 	--disable-bsd-user		\
 	--disable-linux-user		\
 	--enable-system			\
-	--enable-slirp=system		\
 
 # accel
 CONFIGURE_ARGS +=			\
-	--disable-hax			\
 	--disable-hvf			\
 	--disable-whpx			\
 	--disable-xen			\
@@ -357,7 +352,6 @@ CONFIGURE_ARGS +=			\
 	--disable-virglrenderer		\
 	--$(if $(CONFIG_QEMU_UI_VNC),enable,disable)-vnc			\
 	--$(if $(CONFIG_QEMU_UI_VNC_JPEG),enable,disable)-vnc-jpeg		\
-	--$(if $(CONFIG_QEMU_UI_VNC_PNG),enable,disable)-vnc-png		\
 	--$(if $(CONFIG_QEMU_UI_VNC_SASL),enable,disable)-vnc-sasl		\
 	--disable-vte			\
 	--enable-curses			\
@@ -383,6 +377,7 @@ CONFIGURE_ARGS +=			\
 #
 CONFIGURE_ARGS +=			\
 	--audio-drv-list=''		\
+	--disable-af-xdp                \
 	--disable-attr			\
 	--disable-auth-pam		\
 	--disable-brlapi		\
@@ -397,7 +392,7 @@ CONFIGURE_ARGS +=			\
 	--disable-docs			\
 	--disable-fuse			\
 	--disable-gcrypt		\
-	--with-git-submodules=ignore	\
+	--disable-download		\
 	--disable-glusterfs		\
 	--disable-gnutls		\
 	--disable-guest-agent-msi	\
@@ -406,7 +401,7 @@ CONFIGURE_ARGS +=			\
 	--disable-libpmem		\
 	--disable-libssh		\
 	--$(if $(CONFIG_QEMU_DEV_USB),enable,disable)-libusb		\
-	--disable-libxml2		\
+	--disable-libkeyutils           \
 	--disable-linux-aio		\
 	--disable-linux-io-uring	\
 	--disable-lzfse			\
@@ -423,6 +418,7 @@ CONFIGURE_ARGS +=			\
 	--disable-qom-cast-debug	\
 	--disable-rbd			\
 	--disable-rdma			\
+	--disable-rutabaga-gfx          \
 	--disable-sanitizers		\
 	--$(if $(CONFIG_QEMU_SECCOMP),enable,disable)-seccomp		\
 	--disable-smartcard		\
@@ -437,12 +433,13 @@ CONFIGURE_ARGS +=			\
 	--disable-werror		\
 	--disable-xen-pci-passthrough	\
 	--disable-xkbcommon		\
-	--disable-xfsctl		\
-	--disable-zstd			\
+	--$(if $(CONFIG_QEMU_ZSTD),enable,disable)-zstd			\
 	--disable-selinux		\
 	--disable-oss			\
 	--disable-alsa			\
 	--disable-pa			\
+	--disable-vduse-blk-export	\
+	--disable-libdw			\
 
 CONFIGURE_ARGS += --target-list='$(foreach target,$(qemu-target-list),$(if $(CONFIG_PACKAGE_qemu-$(target)),$(target)))'
 CONFIGURE_ARGS += $(if $(CONFIG_PACKAGE_qemu-ga),--enable-guest-agent)

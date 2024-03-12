@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gst1-plugins-base
-PKG_VERSION:=1.20.2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.22.8
+PKG_RELEASE:=1
 
 PKG_SOURCE:=gst-plugins-base-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://gstreamer.freedesktop.org/src/gst-plugins-base
-PKG_HASH:=ab0656f2ad4d38292a803e0cb4ca090943a9b43c8063f650b4d3e3606c317f17
+PKG_HASH:=eb6792e5c73c6defb9159c36ea6e4b78a2f8af6512678b4bd3b02c8d2d492acf
 PKG_BUILD_DIR:=$(BUILD_DIR)/gst-plugins-base-$(PKG_VERSION)
 
 PKG_MAINTAINER:=W. Michael Petullo <mike@flyn.org> \
@@ -40,9 +40,8 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_gst1-mod-tcp \
 	CONFIG_PACKAGE_gst1-mod-theora \
 	CONFIG_PACKAGE_gst1-mod-typefind \
-	CONFIG_PACKAGE_gst1-mod-videoconvert \
+	CONFIG_PACKAGE_gst1-mod-videoconvertscale \
 	CONFIG_PACKAGE_gst1-mod-videorate \
-	CONFIG_PACKAGE_gst1-mod-videoscale \
 	CONFIG_PACKAGE_gst1-mod-videotestsrc \
 	CONFIG_PACKAGE_gst1-mod-volume \
 	CONFIG_PACKAGE_gst1-mod-vorbis \
@@ -138,9 +137,8 @@ MESON_ARGS += \
 	$(call GST_COND_SELECT,subparse) \
 	$(call GST_COND_SELECT,tcp) \
 	-Dtypefind=$(if $(CONFIG_PACKAGE_gst1-mod-typefindfunctions),en,dis)abled \
-	$(call GST_COND_SELECT,videoconvert) \
+	$(call GST_COND_SELECT,videoconvertscale) \
 	$(call GST_COND_SELECT,videorate) \
-	$(call GST_COND_SELECT,videoscale) \
 	$(call GST_COND_SELECT,videotestsrc) \
 	$(call GST_COND_SELECT,volume) \
 	\
@@ -302,11 +300,10 @@ $(eval $(call GstBuildPlugin,subparse,subparse,video,,))
 $(eval $(call GstBuildPlugin,rawparse,parse raw media,audio video,,))
 $(eval $(call GstBuildPlugin,tcp,TCP,net,,))
 $(eval $(call GstBuildPlugin,typefindfunctions,'typefind' functions,audio pbutils tag video,,))
-$(eval $(call GstBuildPlugin,videoconvert,video format conversion,video,,))
+$(eval $(call GstBuildPlugin,videoconvertscale,video format conversion and scaling,video,,))
 $(eval $(call GstBuildPlugin,videorate,Adjusts video frames,video,,))
-$(eval $(call GstBuildPlugin,videoscale,Resizes video,video,,))
-$(eval $(call GstBuildPlugin,videotestsrc,video test,video,,+liboil))
-$(eval $(call GstBuildPlugin,volume,volume,audio controller,,+liboil))
+$(eval $(call GstBuildPlugin,videotestsrc,video test,video,,))
+$(eval $(call GstBuildPlugin,volume,volume,audio controller,,))
 
 $(eval $(call GstBuildPlugin,alsa,ALSA audio source/sink,audio tag,,+alsa-lib))
 $(eval $(call GstBuildPlugin,ivorbisdec,Integer Vorbis decoder plugin for devices without floating point,audio tag,,+libvorbisidec))

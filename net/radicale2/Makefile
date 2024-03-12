@@ -73,7 +73,6 @@ endef
 define Py3Package/radicale2/install
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/radicale $(1)/usr/bin/radicale2
-	$(SED) 's,^#!.*python.*,#!/usr/bin/python$(PYTHON3_VERSION),' $(1)/usr/bin/radicale2
 	$(INSTALL_DIR) $(1)/etc/config $(1)/etc/init.d
 	$(INSTALL_CONF) ./files/radicale2.config $(1)/etc/config/radicale2
 	$(INSTALL_BIN) ./files/radicale2.init $(1)/etc/init.d/radicale2

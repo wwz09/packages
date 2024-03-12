@@ -41,6 +41,7 @@ Package/libuhttpd-mbedtls=$(call Package/libuhttpd/Default,mbedtls,+PACKAGE_libu
 Package/libuhttpd-nossl=$(call Package/libuhttpd/Default,nossl)
 
 CMAKE_OPTIONS += -DBUILD_EXAMPLE=OFF
+TARGET_CFLAGS += -Wno-error=deprecated-declarations
 
 ifeq ($(BUILD_VARIANT),openssl)
   CMAKE_OPTIONS += -DUSE_OPENSSL=ON

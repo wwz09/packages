@@ -7,22 +7,22 @@
 
 include $(TOPDIR)/rules.mk
 PKG_NAME:=frr
-PKG_VERSION:=8.3.0
-PKG_RELEASE:=$(AUTORELEASE)
-PKG_SOURCE_DATE:=2022-07-27
+PKG_VERSION:=9.0.0
+PKG_RELEASE:=1
+PKG_SOURCE_DATE:=2023-08-12
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_SOURCE_DATE).tar.gz
-PKG_SOURCE_VERSION:=4a27375c965a7d9079b7aba1555df54df47f1ca4
+PKG_SOURCE_VERSION:=9852228d1e87bdbad13e0fed8313203f00bf26af
 PKG_SOURCE_URL:=https://codeload.github.com/FRRouting/frr/tar.gz/$(PKG_SOURCE_VERSION)?
 
-
-PKG_HASH:=d09fd6517b955f37418f0d260d0cd5fda0b3f4fd416e3121f270ce3934cdf6ba
+PKG_HASH:=6e611cd86ae9787a4b8d71411fdc38ad1fe843a839756c9c386848ffde81f6cf
 PKG_MAINTAINER:=Lucian Cristian <lucian.cristian@gmail.com>
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_SOURCE_VERSION)
 HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/$(PKG_NAME)-$(PKG_SOURCE_VERSION)
 
 PKG_LICENSE:=GPL-2.0-only LGPL-2.1-only
+PKG_CPE_ID:=cpe:/a:ffrouting:ffrouting
 
 PKG_DAEMON_AVAILABLE:= \
 	babeld \
@@ -58,8 +58,9 @@ PKG_CONFIG_DEPENDS:= \
 PKG_FIXUP:=autoreconf
 PKG_BUILD_PARALLEL:=1
 PKG_INSTALL:=1
+PKG_BUILD_FLAGS:=lto
 
-PKG_BUILD_DEPENDS:=frr/host
+PKG_BUILD_DEPENDS:=frr/host protobuf-c/host
 HOST_BUILD_DEPENDS:=python3/host
 
 include $(INCLUDE_DIR)/package.mk
@@ -96,7 +97,7 @@ endef
 define Package/frr-libfrr
   $(call Package/frr/Default)
   TITLE:=zebra library
-  DEPENDS+=+librt +libatomic +libcap +libjson-c +libyang +FRR_OPENSSL:libopenssl +FRR_SNMP:libnetsnmp
+  DEPENDS+=+librt +libatomic +libcap +libjson-c +libyang +libprotobuf-c +FRR_OPENSSL:libopenssl +FRR_SNMP:libnetsnmp
   CONFLICTS:=quagga-libzebra
 endef
 
@@ -166,7 +167,6 @@ define Package/frr-libfrr/conffiles
 endef
 
 TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed -latomic
-TARGET_CFLAGS += -flto
 
 define Host/Configure
 	$(Host/Configure/Default)

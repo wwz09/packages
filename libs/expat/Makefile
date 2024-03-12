@@ -6,17 +6,18 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=expat
-PKG_VERSION:=2.4.7
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.6.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=@SF/expat
-PKG_HASH:=9875621085300591f1e64c18fd3da3a0eeca4a74f884b9abac2758ad1bd07a7d
+PKG_SOURCE_URL:=@SF/expat \
+	https://github.com/libexpat/libexpat/releases/download/R_$(subst .,_,$(PKG_VERSION))
+PKG_HASH:=cb5f5a8ea211e1cabd59be0a933a52e3c02cc326e86a4d387d8d218e7ee47a3e
 
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=COPYING
-PKG_CPE_ID:=cpe:/a:libexpat:expat
+PKG_CPE_ID:=cpe:/a:libexpat_project:libexpat
 
 CMAKE_INSTALL:=1
 
@@ -40,8 +41,6 @@ CMAKE_OPTIONS += \
 	-DEXPAT_BUILD_EXAMPLES=OFF \
 	-DEXPAT_BUILD_TESTS=OFF \
 	-DEXPAT_BUILD_DOCS=OFF \
-	-DEXPAT_WITH_LIBBSD=OFF \
-	-DEXPAT_ENABLE_INSTALL=ON \
 	-DEXPAT_DTD=OFF \
 	-DEXPAT_NS=OFF \
 	-DEXPAT_DEV_URANDOM=OFF

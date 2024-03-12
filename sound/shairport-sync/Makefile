@@ -7,12 +7,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=shairport-sync
-PKG_VERSION:=3.3.9
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=4.3.2
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/mikebrady/shairport-sync/tar.gz/$(PKG_VERSION)?
-PKG_HASH:=17990cb2620551caa07a1c3b371889e55803071eaada04e958c356547a7e1795
+PKG_HASH:=dfb485c0603398032a00e51f84b874749bbf155b257adda3d270d5989de08bfd
 
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>, \
 		Mike Brady <mikebrady@eircom.net>
@@ -29,7 +29,7 @@ define Package/shairport-sync/default
   SECTION:=sound
   CATEGORY:=Sound
   TITLE:=AirPlay compatible audio player
-  DEPENDS:=@AUDIO_SUPPORT +libpthread +alsa-lib +libalac +libconfig +libdaemon +libpopt
+  DEPENDS:=@AUDIO_SUPPORT +libpthread +alsa-lib +libconfig +libdaemon +libpopt +libstdcpp +libplist +libsodium +libgcrypt +libffmpeg-full +libuuid +nqptp
   PROVIDES:=shairport-sync
   URL:=https://github.com/mikebrady/shairport-sync
 endef
@@ -77,8 +77,9 @@ endef
 
 CONFIGURE_ARGS += \
 	--with-alsa \
-	--with-apple-alac \
 	--with-libdaemon \
+	--with-airplay-2 \
+	--with-pipe \
 	--with-metadata
 
 ifeq ($(BUILD_VARIANT),openssl)
@@ -109,10 +110,10 @@ define Package/shairport-sync/default/install
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/shairport-sync $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/etc
 	$(INSTALL_DATA) $(PKG_INSTALL_DIR)/etc/shairport-sync.conf $(1)/etc/shairport-sync.conf
-	#$(INSTALL_DIR) $(1)/etc/init.d
-	#$(INSTALL_BIN) ./files/shairport-sync.init $(1)/etc/init.d/shairport-sync
-	#$(INSTALL_DIR) $(1)/etc/config
-	#$(INSTALL_CONF) ./files/shairport-sync.config $(1)/etc/config/shairport-sync
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/shairport-sync.init $(1)/etc/init.d/shairport-sync
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) ./files/shairport-sync.config $(1)/etc/config/shairport-sync
 endef
 
 Package/shairport-sync-openssl/install = $(Package/shairport-sync/default/install)

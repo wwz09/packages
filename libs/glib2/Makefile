@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=glib2
-PKG_VERSION:=2.70.4
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.74.7
+PKG_RELEASE:=2
 
 PKG_SOURCE:=glib-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=@GNOME/glib/2.70
-PKG_HASH:=ab3d176f3115dcc4e5d02db795984e04e4f4b48d836252e23e8c468e9d423c33
+PKG_SOURCE_URL:=@GNOME/glib/$(basename $(PKG_VERSION))
+PKG_HASH:=196ab86c27127a61b7a70c3ba6af7b97bdc01c07cd3b21abd5e778b955eccb1b
 
 PKG_MAINTAINER:=Peter Wagner <tripolar@gmx.at>
 PKG_LICENSE:=LGPL-2.1-or-later
@@ -21,10 +21,12 @@ PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:gnome:glib
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/glib-$(PKG_VERSION)
-HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/glib-$(PKG_VERSION)
-PKG_BUILD_DEPENDS:=libiconv/host
-HOST_BUILD_DEPENDS:=libiconv/host libffi/host pcre/host
 PKG_CONFIG_DEPENDS:=CONFIG_BUILD_NLS
+PKG_FORTIFY_SOURCE:=0
+PKG_BUILD_FLAGS:=gc-sections
+
+HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/glib-$(PKG_VERSION)
+HOST_BUILD_DEPENDS:=pcre2/host libffi/host
 
 include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
@@ -34,7 +36,7 @@ include $(INCLUDE_DIR)/meson.mk
 define Package/glib2
   SECTION:=libs
   CATEGORY:=Libraries
-  DEPENDS:=$(ICONV_DEPENDS) $(INTL_DEPENDS) +zlib +libpthread +libffi +libattr +libpcre
+  DEPENDS:=$(ICONV_DEPENDS) $(INTL_DEPENDS) +zlib +libpthread +libffi +libattr +libpcre2
   TITLE:=glib 2.0
   URL:=http://www.gtk.org/
 endef
@@ -43,29 +45,29 @@ define Package/glib2/description
   The GLib library of C routines
 endef
 
-TARGET_CFLAGS += -ffunction-sections -fdata-sections
-TARGET_LDFLAGS += -Wl,--gc-sections
+COMP_ARGS:=
 
-COMP_ARGS= \
-	-Dselinux=disabled \
-	-Dlibmount=disabled \
-	-Dman=false \
-	-Ddtrace=false \
-	-Dsystemtap=false \
-	-Dsysprof=disabled \
-	-Dgtk_doc=false \
-	-Dbsymbolic_functions=true \
-	-Dforce_posix_threads=true \
-	-Dfam=false \
-	-Dtests=false \
-	-Dinstalled_tests=false \
-	-Doss_fuzz=disabled \
-	-Dglib_debug=disabled \
-	-Dglib_assert=false \
-	-Dglib_checks=false \
-	-Dlibelf=disabled
+# default feature=auto see meson_options.txt
+COMP_ARGS+=-Dglib_debug=disabled
 
-MESON_HOST_ARGS += $(COMP_ARGS) -Dxattr=false -Ddefault_library=static -Dnls=disabled
+# default feature=auto see meson_options.txt
+COMP_ARGS+=-Dlibmount=disabled
+
+# default feature=auto see meson_options.txt
+COMP_ARGS+=-Dselinux=disabled
+
+
+# default boolean=false see meson_options.txt
+COMP_ARGS+=-Dforce_posix_threads=true
+
+# default boolean=true see meson_options.txt
+COMP_ARGS+=-Dglib_assert=false
+
+# default boolean=true see meson_options.txt
+COMP_ARGS+=-Dtests=false
+
+
+MESON_HOST_ARGS += $(COMP_ARGS) -Dxattr=false -Ddefault_library=static -Dnls=disabled -Dforce_fallback_for=libpcre2-8
 MESON_ARGS += $(COMP_ARGS) -Dxattr=true -Db_lto=true -Ddefault_library=both -Dnls=$(if $(CONFIG_BUILD_NLS),en,dis)abled
 
 define Build/InstallDev

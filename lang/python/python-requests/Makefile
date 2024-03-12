@@ -8,16 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=python-requests
-PKG_VERSION:=2.28.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.31.0
+PKG_RELEASE:=1
 
-PKG_MAINTAINER:=Josef Schlehofer <josef.schlehofer@nic.cz>, Alexandru Ardelean <ardeleanalex@gmail.com>
+PKG_MAINTAINER:=Josef Schlehofer <pepe.schlehofer@gmail.com>, Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=Apache-2.0
 PKG_LICENSE_FILES:=LICENSE
-PKG_CPE_ID:=cpe:/a:python-requests:requests
+PKG_CPE_ID:=cpe:/a:python:requests
 
 PYPI_NAME:=requests
-PKG_HASH:=7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983
+PKG_HASH:=942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1
 
 include ../pypi.mk
 include $(INCLUDE_DIR)/package.mk
@@ -28,7 +28,7 @@ define Package/python3-requests
   SECTION:=lang
   CATEGORY:=Languages
   TITLE:=HTTP library for Python
-  URL:=https://2.python-requests.org/
+  URL:=https://requests.readthedocs.io
   DEPENDS:= \
 	  +python3-light  \
 	  +python3-chardet  \

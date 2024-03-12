@@ -1,18 +1,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libwebp
-PKG_VERSION:=1.2.4
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.3.2
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://storage.googleapis.com/downloads.webmproject.org/releases/webp
-PKG_HASH:=7bf5a8a28cc69bcfa8cb214f2c3095703c6b73ac5fba4d5480c205331d9494df
+PKG_HASH:=2a499607df669e40258e53d0ade8035ba4ec0175244869d1025d460562aa09b4
 
 PKG_MAINTAINER:=Alexandru Ardelean <ardeleanalex@gmail.com>
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=COPYING
 
 CMAKE_INSTALL:=1
+PKG_BUILD_FLAGS:=lto
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
@@ -46,11 +47,9 @@ CMAKE_OPTIONS += -DWEBP_ENABLE_SIMD=OFF
 endif
 endif
 
-TARGET_CFLAGS += -flto
-
 define Package/libwebp/install
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libwebp*.s* $(1)/usr/lib/
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/lib*.s* $(1)/usr/lib/
 endef
 
 $(eval $(call BuildPackage,libwebp))

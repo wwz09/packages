@@ -8,16 +8,17 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=cryptsetup
-PKG_VERSION:=2.4.3
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.6.1
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=@KERNEL/linux/utils/cryptsetup/v2.4
-PKG_HASH:=fc0df945188172264ec5bf1d0bda08264fadc8a3f856d47eba91f31fe354b507
+PKG_SOURCE_URL:=@KERNEL/linux/utils/cryptsetup/v2.6
+PKG_HASH:=410ded65a1072ab9c8e41added37b9729c087fef4d2db02bb4ef529ad6da4693
 
 PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
 PKG_LICENSE:=GPL-2.0-or-later LGPL-2.1-or-later
 PKG_LICENSE_FILES:=COPYING COPYING.LGPL
+PKG_CPE_ID:=cpe:/a:cryptsetup_project:cryptsetup
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -56,6 +57,7 @@ define Package/cryptsetup-ssh/description
 endef
 
 CONFIGURE_ARGS += \
+	--disable-asciidoc \
 	--disable-cryptsetup-reencrypt \
 	--disable-integritysetup \
 	--disable-selinux \
@@ -74,6 +76,7 @@ CONFIGURE_VARS += \
 	LIBSSH_CFLAGS="-I$(STAGING_DIR)/usr/include" \
 	LIBSSH_LIBS="-L$(STAGING_DIR)/usr/lib -lssh"
 
+TARGET_CFLAGS += -D_LARGEFILE64_SOURCE
 TARGET_LDFLAGS += -Wl,--gc-sections $(if $(INTL_FULL),-lintl)
 
 define Build/InstallDev

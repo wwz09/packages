@@ -6,13 +6,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=gnutls
-PKG_VERSION:=3.7.7
-PKG_RELEASE:=$(AUTORELEASE)
-PKG_USE_MIPS16:=0
+PKG_VERSION:=3.8.3
+PKG_RELEASE:=1
+PKG_BUILD_FLAGS:=no-mips16
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=https://www.gnupg.org/ftp/gcrypt/gnutls/v3.7
-PKG_HASH:=be9143d0d58eab64dba9b77114aaafac529b6c0d7e81de6bdf1c9b59027d2106
+PKG_SOURCE_URL:=https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8
+PKG_HASH:=f74fc5954b27d4ec6dfbb11dea987888b5b124289a3703afcada0ee520f4173e
 
 PKG_MAINTAINER:=Nikos Mavrogiannopoulos <nmav@gnutls.org>
 PKG_LICENSE:=LGPL-2.1-or-later
@@ -132,6 +132,7 @@ CONFIGURE_ARGS+= \
 	--without-idn \
 	--with-default-trust-store-dir=/etc/ssl/certs/ \
 	--with-included-unistring \
+	--with-included-libunistring \
 	--with-librt-prefix="$(LIBRT_ROOT_DIR)/" \
 	--with-pic \
 	--with-system-priority-file="" \

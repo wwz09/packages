@@ -9,9 +9,9 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=kitty-terminfo
 PKG_VERSION:=0.24.4
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=2
 
-PKG_LICENSE:=GPL-3.0-or-later
+PKG_LICENSE:=GPL-3.0-only
 
 PKG_SOURCE:=kitty-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/kovidgoyal/kitty/tar.gz/v$(PKG_VERSION)?

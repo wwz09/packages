@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=ntfs-3g
 PKG_VERSION:=2022.5.17
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)_ntfsprogs-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://www.tuxera.com/opensource/
@@ -16,7 +16,7 @@ PKG_HASH:=0489fbb6972581e1b417ab578d543f6ae522e7fa648c3c9b49c789510fd5eb93
 PKG_MAINTAINER:=Ted Hess <thess@kitschensync.net>
 PKG_LICENSE:=GPL-2.0-only LGPL-2.1-or-later
 PKG_LICENSE_FILES:=COPYING COPYING.LIB
-PKG_CPE_ID:=cpe:/a:ntfs-3g:ntfs-3g
+PKG_CPE_ID:=cpe:/a:tuxera:ntfs-3g
 
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
@@ -53,7 +53,6 @@ define Package/ntfs-3g/description
   Contains:
    - ntfs-3g
    - ntfs-3g.probe
-   - mount.ntfs (symlink to ntfs-3g)
    - mount.ntfs-3g (symlink to ntfs-3g)
 
 endef
@@ -161,7 +160,6 @@ define Package/ntfs-3g/install
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libntfs-3g.so.* $(1)/usr/lib/
 	$(INSTALL_DIR) $(1)/sbin
-	$(LN) ../usr/bin/ntfs-3g $(1)/sbin/mount.ntfs
 	$(LN) ../usr/bin/ntfs-3g $(1)/sbin/mount.ntfs-3g
 endef
 

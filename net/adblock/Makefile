@@ -1,29 +1,28 @@
 #
-# Copyright (c) 2015-2020 Dirk Brenken (dev@brenken.org)
+# Copyright (c) 2015-2024 Dirk Brenken (dev@brenken.org)
 # This is free software, licensed under the GNU General Public License v3.
 #
 
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=adblock
-PKG_VERSION:=4.0.1
-PKG_RELEASE:=2
+PKG_VERSION:=4.1.5
+PKG_RELEASE:=9
 PKG_LICENSE:=GPL-3.0-or-later
 PKG_MAINTAINER:=Dirk Brenken <dev@brenken.org>
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/adblock
-  SECTION:=net
-  CATEGORY:=Network
-  TITLE:=Powerful adblock script to block ad/abuse domains by using DNS
-  DEPENDS:=+jshn +jsonfilter +coreutils-sort +wget-ssl \
-    @(PACKAGE_libustream-mbedtls||PACKAGE_libustream-openssl||PACKAGE_libustream-wolfssl)
-  PKGARCH:=all
+	SECTION:=net
+	CATEGORY:=Network
+	TITLE:=Powerful adblock script to block ad/abuse domains by using DNS
+	DEPENDS:=+jshn +jsonfilter +coreutils +coreutils-sort +ca-bundle +opkg
+	PKGARCH:=all
 endef
 
 define Package/adblock/description
-Powerful adblock script to block ad/abuse domains via dnsmasq, unbound, named or kresd.
+Powerful adblock solution to block ad/abuse domains via dnsmasq, unbound, named or kresd.
 The script supports many domain blacklist sites plus manual black- and whitelist overrides.
 Please see https://github.com/openwrt/packages/blob/master/net/adblock/files/README.md for further information.
 
@@ -55,9 +54,12 @@ define Package/adblock/install
 	$(INSTALL_CONF) ./files/adblock.conf $(1)/etc/config/adblock
 
 	$(INSTALL_DIR) $(1)/etc/adblock
-	$(INSTALL_BIN) ./files/adblock.notify $(1)/etc/adblock
+	$(INSTALL_BIN) ./files/adblock.mail $(1)/etc/adblock
 	$(INSTALL_CONF) ./files/adblock.blacklist $(1)/etc/adblock
 	$(INSTALL_CONF) ./files/adblock.whitelist $(1)/etc/adblock
+	$(INSTALL_CONF) ./files/adblock.categories $(1)/etc/adblock
+	$(INSTALL_CONF) ./files/adblock.sources $(1)/etc/adblock
+	gzip -9n $(1)/etc/adblock/adblock.sources
 endef
 
 $(eval $(call BuildPackage,adblock))

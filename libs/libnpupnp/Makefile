@@ -1,22 +1,21 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libnpupnp
-PKG_VERSION:=4.2.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=6.1.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://www.lesbonscomptes.com/upmpdcli/downloads
-PKG_HASH:=e0e59eb2d3d024e827050428e0e7eb228355912a38c85eb30bfeb2f0926eca4c
+PKG_HASH:=1e305abf63ac945d9cb4576689670c009a914dc9d05b4c1ed605391e7f6b9719
 
 PKG_MAINTAINER:=
 PKG_LICENSE:=LGPL-2.1-or-later
 PKG_LICENSE_FILES:=COPYING
 
-PKG_INSTALL:=1
-PKG_BUILD_PARALLEL:=1
 PKG_BUILD_DEPENDS:=libmicrohttpd
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/meson.mk
 
 define Package/libnpupnp
   SECTION:=libs
@@ -32,8 +31,8 @@ venerable pupnp (https://github.com/pupnp/pupnp), based on its 1.6.x
 branch (around 1.6.25).
 endef
 
-TARGET_CFLAGS += -flto
-TARGET_LDFLAGS += -flto
+MESON_OPTIONS += \
+	-Db_lto=true
 
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include/npupnp

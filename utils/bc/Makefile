@@ -12,12 +12,13 @@ PKG_VERSION:=1.06.95
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)_$(PKG_VERSION).orig.tar.gz
-PKG_SOURCE_URL:=@DEBIAN/debian/pool/main/b/bc
+PKG_SOURCE_URL:=@DEBIAN/pool/main/b/bc
 PKG_HASH:=5e1471869dd27ba4120dd3942d2f4ec6646cf917fb056be9ae0d3a8259668d47
 
 PKG_MAINTAINER:=Bruno Randolf <br1@einfach.org>
 PKG_LICENSE:=GPL-2.0
 PKG_LICENSE_FILES:=COPYING
+PKG_CPE_ID:=cpe:/a:gnu:bc
 
 include $(INCLUDE_DIR)/package.mk
 

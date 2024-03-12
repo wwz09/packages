@@ -18,7 +18,7 @@ Date:   Thu Jun 25 19:38:24 2015 +0300
  
  /* daemon(3) exists only in 4.4BSD or later, and in GNU libc */
 -#if !defined(ANDROID) && !defined(WINDOWS32) && !(defined(BSD) && (BSD >= 199306)) && !defined(__GLIBC__)
-+#ifdef __UCLIBC__
++#ifdef __NO_DAEMON__
  static int daemon(int nochdir, int noclose)
  {
   	int fd, i;

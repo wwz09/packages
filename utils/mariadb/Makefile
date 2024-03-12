@@ -9,20 +9,20 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mariadb
-PKG_VERSION:=10.6.4
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=10.9.8
+PKG_RELEASE:=3
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL := https://archive.mariadb.org/$(PKG_NAME)-$(PKG_VERSION)/source
 
-PKG_HASH:=75bf9b147a95d38160d01a73b098d50a1960563b46d16a235971fff64d99643c
+PKG_HASH:=fcdc6f73882477c20310e795a02f746e54934aa7a8b368900bd45e78a5daf6ed
 PKG_MAINTAINER:=Michal Hrusecky <Michal@Hrusecky.net>
 PKG_LICENSE:=GPL-2.0-only
 PKG_LICENSE_FILES:=COPYING THIRDPARTY
 
 PKG_CPE_ID:=cpe:/a:mariadb:mariadb
 
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 HOST_BUILD_DEPENDS:=libxml2/host
 # Without libevent2 tests/async_queries sporadically fails on the bots
@@ -35,14 +35,12 @@ SHARE_DIR:=/usr/share/mariadb
 MARIADB_SOCKET=/var/run/mysql/mysql.sock
 
 MARIADB_DISABLE_ENGINES := \
-	cassandra \
 	columnstore \
 	example \
 	mroonga \
 	oqgraph \
 	rocksdb \
-	test_sql_discovery \
-	tokudb
+	test_sql_discovery
 
 MARIADB_DISABLE_PLUGINS := \
 	audit_null \
@@ -171,6 +169,7 @@ include $(INCLUDE_DIR)/cmake.mk
 MARIADB_COMMON_DEPENDS := \
 	$(ICONV_DEPENDS) \
 	+libatomic \
+	+libfmt \
 	+libopenssl \
 	+libstdcpp \
 	+zlib
@@ -178,6 +177,10 @@ MARIADB_COMMON_DEPENDS := \
 # Pass CPPFLAGS in the CFLAGS as otherwise the build system will
 # ignore them.
 TARGET_CFLAGS+=$(TARGET_CPPFLAGS)
+
+ifneq ($(CONFIG_USE_MUSL),)
+  TARGET_CFLAGS += -D_LARGEFILE64_SOURCE
+endif
 
 define Package/mariadb/disable/engine
 	echo > $(1)/storage/$(2)/CMakeLists.txt
@@ -368,6 +371,7 @@ CMAKE_OPTIONS += \
 	-DWITH_INNODB_SNAPPY=OFF \
 	-DWITH_JEMALLOC=OFF \
 	-DWITH_LIBARCHIVE=OFF \
+	-DWITH_LIBFMT=system \
 	-DWITH_LIBWRAP=OFF \
 	-DWITH_MARIABACKUP=ON \
 	-DWITH_NUMA=OFF \

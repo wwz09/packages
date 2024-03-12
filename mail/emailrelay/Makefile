@@ -8,18 +8,19 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=emailrelay
-PKG_VERSION:=2.2
+PKG_VERSION:=2.4.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION)-src.tar.gz
 PKG_SOURCE_URL:=@SF/emailrelay/$(PKG_VERSION)
-PKG_HASH:=41da9f4356eb6c6935a32f2940edb7af04b202e531c1028f700b93a36a03b0ac
+PKG_HASH:=cff8cf5bff19fd1721cefdbd6207da67af01d2b1b4a51d147c33f4429a79766e
 
 PKG_MAINTAINER:=Federico Di Marco <fededim@gmail.com>
 PKG_LICENSE:=GPL-3.0-or-later
 PKG_LICENSE_FILES:=COPYING
 
 PKG_CONFIG_DEPENDS:=CONFIG_EMAILRELAY_SUPPORT_VERBOSE_DBG CONFIG_EMAILRELAY_SSL
+PKG_BUILD_FLAGS:=gc-sections lto
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -94,8 +95,7 @@ ifeq ($(CONFIG_EMAILRELAY_SUPPORT_VERBOSE_DBG),y)
 		--enable-debug=yes
 endif
 
-TARGET_CXXFLAGS += -ffunction-sections -fdata-sections -flto
-TARGET_CXXFLAGS += -Wl,--gc-sections,--as-needed
+TARGET_CXXFLAGS += -Wl,--as-needed
 
 define Package/emailrelay/install
 	$(INSTALL_DIR) $(1)/usr/bin

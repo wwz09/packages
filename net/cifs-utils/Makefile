@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=cifs-utils
 PKG_VERSION:=6.11
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://download.samba.org/pub/linux-cifs/cifs-utils/
@@ -23,6 +23,7 @@ PKG_CPE_ID:=cpe:/a:samba:cifs-utils
 PKG_FIXUP:=autoreconf
 PKG_INSTALL:=1
 PKG_BUILD_PARALLEL:=1
+PKG_BUILD_FLAGS:=lto
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -57,7 +58,7 @@ CONFIGURE_ARGS += \
 CONFIGURE_ARGS += \
 	ac_cv_lib_cap_ng_capng_clear=no
 
-TARGET_CFLAGS += $(FPIC) -ffunction-sections -flto
+TARGET_CFLAGS += $(FPIC) -ffunction-sections
 TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed
 
 define Build/InstallDev
@@ -68,7 +69,7 @@ endef
 define Package/cifsmount/install
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/sbin/mount.cifs $(1)/usr/sbin/
-	$(LN) /usr/sbin/mount.cifs $(1)/usr/sbin/mount.smb3
+	$(LN) mount.cifs $(1)/usr/sbin/mount.smb3
 endef
 
 define Package/smbinfo/install

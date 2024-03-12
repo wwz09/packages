@@ -9,22 +9,33 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lxc
-PKG_VERSION:=4.0.12
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=5.0.3
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://linuxcontainers.org/downloads/lxc/
-PKG_HASH:=db242f8366fc63e8c7588bb2017b354173cf3c4b20abc18780debdc48b14d3ef
+PKG_HASH:=2693a4c654dcfdafb3aa95c262051d8122afa1b6f5cef1920221ebbdee934d07
 
-PKG_MAINTAINER:=Marko Ratkaj <marko.ratkaj@sartura.hr>
+PKG_MAINTAINER:=Marko Ratkaj <markoratkaj@gmail.com>
 PKG_LICENSE:=LGPL-2.1-or-later BSD-2-Clause GPL-2.0
-
-PKG_FIXUP:=autoreconf
-PKG_INSTALL:=1
-PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_LICENSE_FILES:=COPYING LICENSE.GPL2 LICENSE.LGPL2.1
+PKG_CPE_ID:=cpe:/a:linuxcontainers:lxc
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/meson.mk
+
+MESON_ARGS += \
+	-Db_lto=$(if $(findstring mips,$(CONFIG_ARCH)),false,true) \
+	-Dwerror=false \
+	-Dinit-script=sysvinit \
+	-Dman=false \
+	-Dapparmor=false \
+	-Dselinux=false \
+	-Dseccomp=$(if $(CONFIG_LXC_SECCOMP),true,false) \
+	-Dexamples=false \
+	-Db_pie=true \
+	-Druntime-path=/var/run
 
 LXC_APPLETS_BIN += \
 	attach autostart cgroup copy config console create destroy device \
@@ -134,17 +145,6 @@ define Package/lxc-init
   TITLE:=LXC Lua bindings
   DEPENDS+= +liblxc
 endef
-
-CONFIGURE_ARGS += \
-	--disable-werror \
-	--disable-rpath \
-	--disable-doc \
-	--disable-api-docs \
-	--disable-apparmor \
-	--disable-selinux \
-	--$(if $(CONFIG_LXC_SECCOMP),en,dis)able-seccomp \
-	--enable-capabilities \
-	--disable-examples
 
 ifdef CONFIG_USE_MIPS16
   TARGET_CFLAGS += -minterlink-mips16
@@ -262,7 +262,6 @@ define GenPlugin
   $$(eval $$(call BuildPackage,lxc-$(1)))
 endef
 
-
 $(eval $(call BuildPackage,lxc))
 $(eval $(call BuildPackage,lxc-common))
 $(eval $(call BuildPackage,lxc-hooks))
@@ -273,5 +272,5 @@ $(eval $(call BuildPackage,lxc-init))
 $(eval $(call BuildPackage,lxc-auto))
 $(eval $(call BuildPackage,lxc-unprivileged))
 $(foreach u,$(LXC_APPLETS_BIN),$(eval $(call GenPlugin,$(u),$(DEPENDS_APPLETS),"/usr/bin")))
-$(foreach u,$(LXC_APPLETS_LIB),$(eval $(call GenPlugin,$(u),$(DEPENDS_APPLETS),"/usr/lib/lxc")))
+$(foreach u,$(LXC_APPLETS_LIB),$(eval $(call GenPlugin,$(u),$(DEPENDS_APPLETS),"/usr/libexec/lxc")))
 $(foreach u,$(LXC_SCRIPTS),$(eval $(call GenPlugin,$(u),,"/usr/bin")))

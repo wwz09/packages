@@ -8,16 +8,16 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=libpng
-PKG_VERSION:=1.6.37
-PKG_RELEASE:=11
+PKG_VERSION:=1.6.42
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@SF/libpng
-PKG_HASH:=505e70834d35383537b6491e7ae8641f1a4bed1876dbfe361201fc80868d88ca
+PKG_HASH:=c919dbc11f4c03b05aba3f8884d8eb7adfe3572ad228af972bb60057bdb48450
 
 PKG_MAINTAINER:=Jo-Philipp Wich <jo@mein.io>
 PKG_LICENSE:=Libpng GPL-2.0-or-later BSD-3-Clause
-PKC_LICENSE_FILES:=LICENSE contrib/gregbook/COPYING contrib/gregbook/LICENSE
+PKG_LICENSE_FILES:=LICENSE contrib/gregbook/COPYING contrib/gregbook/LICENSE
 PKG_CPE_ID:=cpe:/a:libpng:libpng
 
 include $(INCLUDE_DIR)/package.mk
@@ -33,14 +33,11 @@ endef
 
 CMAKE_OPTIONS += \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	-DPNG_BUILD_ZLIB=OFF \
-	-DPNG_SHARED=ON \
-	-DPNG_STATIC=ON \
-	-DPNG_EXECUTABLES=OFF \
+	-DPNG_TOOLS=OFF \
 	-DPNG_TESTS=OFF \
 	-DPNG_FRAMEWORK=OFF \
-	-DPNG_DEBUG=OFF \
 	-DPNG_HARDWARE_OPTIMIZATIONS=O$(if $(findstring powerpc,$(CONFIG_ARCH))$(findstring mips,$(CONFIG_ARCH)),FF,N) \
+	-DPNG_ARM_NEON=$(if $(or $(findstring aarch64,$(CONFIG_ARCH)),$(findstring neon,$(CONFIG_CPU_TYPE))),on,off) \
 	-Dld-version-script=OFF
 
 define Build/InstallDev

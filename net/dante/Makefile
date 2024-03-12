@@ -9,7 +9,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dante
 PKG_VERSION:=1.4.3
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=http://www.inet.no/dante/files/
@@ -87,7 +87,7 @@ This package provides the Dante sockd daemon.
 endef
 
 define Package/sockd/conffiles
-	/etc/sockd.conf
+/etc/sockd.conf
 endef
 
 define Package/sockd/install
@@ -116,7 +116,7 @@ This package provides the Dante socksify client.
 endef
 
 define Package/socksify/conffiles
-	/etc/socks.conf
+/etc/socks.conf
 endef
 
 define Package/socksify/install

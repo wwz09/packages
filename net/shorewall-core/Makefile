@@ -49,7 +49,7 @@ define Package/shorewall-core/description
 endef
 
 define Package/shorewall-core/conffiles
-	/usr/share/shorewall/shorewallrc
+/usr/share/shorewall/shorewallrc
 endef
 
 CONFIGURE_ARGS += \

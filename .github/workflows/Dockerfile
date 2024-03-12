@@ -1,5 +1,5 @@
 ARG ARCH=x86-64
-FROM immortalwrt/rootfs:$ARCH
+FROM openwrt/rootfs:$ARCH
 
 ADD entrypoint.sh /entrypoint.sh
 

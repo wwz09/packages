@@ -10,8 +10,6 @@ Signed-off-by: Yousong Zhou <yszhou4tech@gmail.com>
  m4/openvswitch.m4        | 6 ++++--
  3 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/lib/automake.mk b/lib/automake.mk
-index 380a67228..610f3d940 100644
 --- a/lib/automake.mk
 +++ b/lib/automake.mk
 @@ -10,6 +10,8 @@ lib_LTLIBRARIES += lib/libopenvswitch.la
@@ -23,22 +21,18 @@ index 380a67228..610f3d940 100644
  
  
  if WIN32
-diff --git a/lib/libopenvswitch.pc.in b/lib/libopenvswitch.pc.in
-index 2a3f2ca7b..c8d02eb5a 100644
 --- a/lib/libopenvswitch.pc.in
 +++ b/lib/libopenvswitch.pc.in
 @@ -7,5 +7,5 @@ Name: libopenvswitch
  Description: Open vSwitch library
  Version: @VERSION@
  Libs: -L${libdir} -lopenvswitch
--Libs.private: @LIBS@
+-Libs.private: @LIBS@ @SSL_LIBS@ @CAPNG_LDADD@ @LIBBPF_LDADD@
 +Libs.private: @LIBS@ @SSL_LIBS@ @CAPNG_LDADD@ @LIBBPF_LDADD@ @LIBUNBOUND_LDADD@ @LIBUNWIND_LDADD@
- Cflags: -I${includedir}/openvswitch
-diff --git a/m4/openvswitch.m4 b/m4/openvswitch.m4
-index f2e0169f8..e000c1cc5 100644
+ Cflags: -I${includedir}
 --- a/m4/openvswitch.m4
 +++ b/m4/openvswitch.m4
-@@ -646,7 +646,8 @@ AC_DEFUN([OVS_CHECK_UNBOUND],
+@@ -677,7 +677,8 @@ AC_DEFUN([OVS_CHECK_UNBOUND],
    [AC_CHECK_LIB(unbound, ub_ctx_create, [HAVE_UNBOUND=yes], [HAVE_UNBOUND=no])
     if test "$HAVE_UNBOUND" = yes; then
       AC_DEFINE([HAVE_UNBOUND], [1], [Define to 1 if unbound is detected.])
@@ -48,7 +42,7 @@ index f2e0169f8..e000c1cc5 100644
     fi
     AM_CONDITIONAL([HAVE_UNBOUND], [test "$HAVE_UNBOUND" = yes])
     AC_SUBST([HAVE_UNBOUND])])
-@@ -658,7 +659,8 @@ AC_DEFUN([OVS_CHECK_UNWIND],
+@@ -689,7 +690,8 @@ AC_DEFUN([OVS_CHECK_UNWIND],
     [HAVE_UNWIND=no])
     if test "$HAVE_UNWIND" = yes; then
       AC_DEFINE([HAVE_UNWIND], [1], [Define to 1 if unwind is detected.])

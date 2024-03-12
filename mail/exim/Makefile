@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=exim
-PKG_VERSION:=4.95
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=4.96.2
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://ftp.exim.org/pub/exim/exim4/
-PKG_HASH:=cc9cb653fff2ea947c3702680b59c99ac0bd1bbf19976d37e22a463cd804f167
+PKG_HASH:=038e327e8d1e93d005bac9bb06fd22aec44d5028930d6dbe8817ad44bbfc1de6
 PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
 
 PKG_LICENSE:=GPL-2.0-or-later
@@ -45,7 +45,7 @@ LOOKUPS:= \
 define Package/exim/Default
   SECTION:=mail
   CATEGORY:=Mail
-  DEPENDS:=+libdb47 +libpcre $(ICONV_DEPENDS) +BUILD_NLS:libidn2 +BUILD_NLS:libidn
+  DEPENDS:=+libdb47 +libpcre2 $(ICONV_DEPENDS) +BUILD_NLS:libidn2 +BUILD_NLS:libidn
   TITLE:=Exim message transfer agent
   URL:=http://www.exim.org/
   USERID:=exim=42:exim=42
@@ -139,7 +139,6 @@ endef
 
 HOST_CFLAGS += -std=c99
 TARGET_CFLAGS += $(FPIC) -DNO_IP_OPTIONS -D_FILE_OFFSET_BITS=64
-TARGET_LDFLAGS += $(if $(CONFIG_USE_GLIBC),-ldl)
 
 MAKE_VARS += build=Linux-$$(ARCH)
 MAKE_FLAGS += AR="$$(TARGET_AR) r"

@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=mdio-tools
-PKG_RELEASE:=2
+PKG_RELEASE:=1
 
 PKG_SOURCE_URL:=https://github.com/wkz/mdio-tools
 PKG_SOURCE_PROTO:=git
-PKG_SOURCE_VERSION:=1.1.1
-PKG_MIRROR_HASH:=aec5a5d8031de166a5ff38dc5442cfbf5de002b11c0a256ea4a03ae047040d03
+PKG_SOURCE_VERSION:=1.3.1
+PKG_MIRROR_HASH:=b7973284dc3dffef4bd2a904e3f7aa7fd3caab4aecf85ac57488f5acbf341aba
 
 PKG_FIXUP:=autoreconf
 

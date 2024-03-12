@@ -6,17 +6,20 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=taglib
-PKG_VERSION:=1.12-beta-2
+PKG_VERSION:=2.0
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/taglib/taglib/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=e273e9d97592cebd4e84e71313e91e9df0fc4a8e00c35daea62325e8bebb87d9
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/taglib/taglib
+PKG_SOURCE_VERSION:=v$(PKG_VERSION)
+PKG_MIRROR_HASH:=dd87b5d02264af72303f109fbaea11c8e1e6a98fe0617717008909b6fdc094a7
 
 PKG_MAINTAINER:=
 PKG_LICENSE:=LGPL-2.1-or-later
 PKG_LICENSE_FILES:=COPYING.LGPL
 PKG_CPE_ID:=cpe:/a:taglib:taglib
+
+PKG_BUILD_FLAGS:=lto
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
@@ -42,8 +45,6 @@ CMAKE_OPTIONS += \
 	-DBUILD_EXAMPLES=OFF \
 	-DBUILD_BINDINGS=OFF \
 	-DNO_ITUNES_HACKS=ON
-
-TARGET_CXXFLAGS += -flto
 
 define Build/InstallDev
 	$(call Build/InstallDev/cmake,$(1))

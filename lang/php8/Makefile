@@ -6,7 +6,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=php
-PKG_VERSION:=8.1.9
+PKG_VERSION:=8.3.3
 PKG_RELEASE:=1
 
 PKG_MAINTAINER:=Michael Heimpold <mhei@heimpold.de>
@@ -15,11 +15,11 @@ PKG_LICENSE_FILES:=LICENSE
 PKG_CPE_ID:=cpe:/a:php:php
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
-PKG_SOURCE_URL:=http://www.php.net/distributions/
-PKG_HASH:=53477e73e6254dc942b68913a58d815ffdbf6946baf61a1f8ef854de524c27bf
+PKG_SOURCE_URL:=https://www.php.net/distributions/
+PKG_HASH:=b0a996276fe21fe9ca8f993314c8bc02750f464c7b0343f056fb0894a8dfa9d1
 
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 PHP8_MODULES= \
 	bcmath \
@@ -33,7 +33,7 @@ PHP8_MODULES= \
 	mbstring mysqli mysqlnd \
 	opcache openssl \
 	pcntl pdo pdo-mysql pdo-pgsql pdo-sqlite pgsql phar \
-	session shmop simplexml snmp soap sockets sqlite3 sysvmsg sysvsem sysvshm \
+	session shmop simplexml snmp soap sockets sodium sqlite3 sysvmsg sysvsem sysvshm \
 	tokenizer \
 	xml xmlreader xmlwriter \
 	zip
@@ -94,7 +94,7 @@ endef
 
 define Package/php8-cli
   $(call Package/php8/Default)
-  DEPENDS+= +PACKAGE_php8-mod-intl:libstdcpp
+  DEPENDS+= +PACKAGE_php8-mod-intl:libstdcpp +riscv64:libatomic
   TITLE+= (CLI)
 endef
 
@@ -105,7 +105,7 @@ endef
 
 define Package/php8-cgi
   $(call Package/php8/Default)
-  DEPENDS+= +PACKAGE_php8-mod-intl:libstdcpp
+  DEPENDS+= +PACKAGE_php8-mod-intl:libstdcpp +riscv64:libatomic
   TITLE+= (CGI & FastCGI)
 endef
 
@@ -127,7 +127,7 @@ endef
 
 define Package/php8-fpm
   $(call Package/php8/Default)
-  DEPENDS+= +PACKAGE_php8-mod-intl:libstdcpp
+  DEPENDS+= +PACKAGE_php8-mod-intl:libstdcpp +riscv64:libatomic
   TITLE+= (FPM)
 endef
 
@@ -159,6 +159,7 @@ define Package/apache-mod-php8
   CATEGORY:=Network
   DEPENDS+=PACKAGE_apache-mod-php8:apache \
 	   +PACKAGE_php8-mod-intl:libstdcpp \
+	   +riscv64:libatomic \
 	   +libpcre2 +zlib
   TITLE:=PHP8 module for Apache Web Server
 endef
@@ -193,6 +194,12 @@ CONFIGURE_ARGS+= \
 
 ifeq ($(CONFIG_LIBC_USE_GLIBC),y)
 TARGET_LDFLAGS += -ldl
+endif
+ifeq ($(CONFIG_USE_MUSL),y)
+TARGET_CFLAGS += -D_LARGEFILE64_SOURCE
+endif
+ifneq ($(findstring riscv64,$(CONFIG_ARCH)),)
+TARGET_LDFLAGS += -latomic
 endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php8-mod-bcmath),)
@@ -270,7 +277,13 @@ else
 endif
 
 ifneq ($(SDK)$(CONFIG_PACKAGE_php8-mod-iconv),)
-  CONFIGURE_ARGS+= --with-iconv=shared,"$(ICONV_PREFIX)"
+  ifeq ($(CONFIG_BUILD_NLS),y)
+    CONFIGURE_VARS+= iconv_impl_name="gnu_libiconv"
+    CONFIGURE_ARGS+= --with-iconv=shared,"$(ICONV_PREFIX)"
+  else
+    CONFIGURE_VARS+= ac_cv_func_iconv=yes
+    CONFIGURE_ARGS+= --with-iconv=shared
+  endif
 else
   CONFIGURE_ARGS+= --without-iconv
 endif
@@ -409,6 +422,12 @@ else
   CONFIGURE_ARGS+= --disable-sockets
 endif
 
+ifneq ($(SDK)$(CONFIG_PACKAGE_php8-mod-sodium),)
+  CONFIGURE_ARGS+= --with-sodium=shared,"$(STAGING_DIR)/usr"
+else
+  CONFIGURE_ARGS+= --without-sodium
+endif
+
 ifneq ($(SDK)$(CONFIG_PACKAGE_php8-mod-sqlite3),)
   CONFIGURE_ARGS+= --with-sqlite3=shared
 else
@@ -485,7 +504,6 @@ endif
 CONFIGURE_VARS+= \
 	ac_cv_c_bigendian_php=$(if $(CONFIG_BIG_ENDIAN),yes,no) \
 	php_cv_cc_rpath="no" \
-	iconv_impl_name="gnu_libiconv" \
 	ac_cv_php_xml2_config_path="$(STAGING_DIR)/host/bin/xml2-config" \
 	ac_cv_u8t_decompose=yes \
 	ac_cv_have_pcre2_jit=no
@@ -589,6 +607,8 @@ define BuildModule
   define Package/php8-mod-$(1)
     $(call Package/php8/Default)
 
+    DEPENDS+=+riscv64:libatomic
+
     ifneq ($(3),)
       DEPENDS+=$(3)
     endif
@@ -653,6 +673,7 @@ $(eval $(call BuildModule,simplexml,SimpleXML,+@PHP8_LIBXML +PACKAGE_php8-mod-si
 $(eval $(call BuildModule,snmp,SNMP,+PACKAGE_php8-mod-snmp:libnetsnmp +PACKAGE_php8-mod-snmp:libopenssl))
 $(eval $(call BuildModule,soap,SOAP,+@PHP8_LIBXML +PACKAGE_php8-mod-soap:libxml2))
 $(eval $(call BuildModule,sockets,Sockets))
+$(eval $(call BuildModule,sodium,Sodium,+PACKAGE_php8-mod-sodium:libsodium,30))
 $(eval $(call BuildModule,sqlite3,SQLite3,+PACKAGE_php8-mod-sqlite3:libsqlite3))
 $(eval $(call BuildModule,sysvmsg,System V messages))
 $(eval $(call BuildModule,sysvsem,System V shared memory))

@@ -8,7 +8,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=lcd4linux
-PKG_RELEASE:=5
+PKG_RELEASE:=10
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/feckert/lcd4linux
@@ -67,14 +67,12 @@ LCD4LINUX_DRIVERS:= \
 	picoLCDGraphic \
 	PNG \
 	PPM \
-	$(if $(CONFIG_TARGET_rb532),RouterBoard) \
 	$(if $(CONFIG_BROKEN),SamsungSPF) \
 	ShuttleVFD \
 	SimpleLCD \
 	st2205 \
 	T6963 \
 	TeakLCM \
-	$(if $(CONFIG_TARGET_ar71xx),TEW673GRU) \
 	Trefon \
 	USBHUB \
 	USBLCD \
@@ -196,6 +194,10 @@ $(call Package/lcd4linux/Default/description)
  drivers and plugins.
 endef
 
+
+CONFIGURE_VARS+= \
+	ANSICXX_TRUE=yes \
+	am__fastdepCXX_TRUE=yes
 
 CONFIGURE_ARGS+= \
 	--disable-rpath

@@ -5,12 +5,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=alist
-PKG_VERSION:=3.14.0
+PKG_VERSION:=3.32.0
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/alist-org/alist/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=1eb53bb32eb95db0be695e16fad70b6a2da1c984cea9fb0879da86a83ed54188
+PKG_HASH:=3a7e17c7106488b769af41ef5058c3cf0bd18665aadce241ba90d1ec5a528d90
 
 PKG_LICENSE:=AGPL-3.0-only
 PKG_LICENSE_FILES:=LICENSE
@@ -18,7 +18,7 @@ PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
 PKG_BUILD_DEPENDS:=golang/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 GO_PKG:=github.com/alist-org/alist/v3
 GO_PKG_LDFLAGS_X:= \
@@ -36,12 +36,23 @@ define Package/alist
   DEPENDS:=$(GO_ARCH_DEPENDS) +ca-bundle +fuse-utils
 endef
 
-WEB_FILE:=$(PKG_NAME)-web-$(PKG_VERSION).tar.gz
+define Package/alist/description
+  A file list program that supports multiple storage, and supports
+  web browsing and webdav, powered by gin and Solidjs.
+endef
+
+define Package/alist/conffiles
+/etc/alist/
+/etc/config/alist
+endef
+
+WEB_VERSION:=3.32.0
+WEB_FILE:=$(PKG_NAME)-web-$(WEB_VERSION).tar.gz
 define Download/alist-web
-	URL:=https://github.com/alist-org/alist-web/releases/download/$(PKG_VERSION)/dist.tar.gz?
-	URL_FILE:=$(WEB_FILE)
+	URL:=https://github.com/alist-org/alist-web/releases/download/$(WEB_VERSION)/
+	URL_FILE:=dist.tar.gz
 	FILE:=$(WEB_FILE)
-	HASH:=05d87c5b874e209c2016126eb75c3837decdfb99982f2f85adcd9502f9f61af7
+	HASH:=2af925073e521ffadd99866b65be54d495a4dce0b416446910230cd83b4b121f
 endef
 
 define Build/Prepare
@@ -53,11 +64,20 @@ define Build/Prepare
 	)
 endef
 
+ifneq ($(CONFIG_USE_MUSL),)
+  TARGET_CFLAGS += -D_LARGEFILE64_SOURCE
+endif
+
 define Package/alist/install
 	$(call GoPackage/Package/Install/Bin,$(PKG_INSTALL_DIR))
 
 	$(INSTALL_DIR) $(1)/usr/bin/
 	$(INSTALL_BIN) $(PKG_INSTALL_DIR)/usr/bin/alist $(1)/usr/bin/
+
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) $(CURDIR)/files/alist.config $(1)/etc/config/alist
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) $(CURDIR)/files/alist.init $(1)/etc/init.d/alist
 endef
 
 $(eval $(call Download,alist-web))

@@ -1,14 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=crun
-PKG_VERSION:=1.4.5
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=1.14.1
+PKG_RELEASE:=1
 
-PKG_SOURCE_PROTO:=git
-PKG_SOURCE_URL:=https://github.com/containers/crun.git
-PKG_SOURCE_DATE:=2022-05-09
-PKG_SOURCE_VERSION:=85649a8c561f7fbf018e5c5640a7e9370c80ce73
-PKG_MIRROR_HASH:=69b7db70fc13d16244609bbbd5240792519810a60d9f68ba6d5ed3def1b23fe9
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
+PKG_SOURCE_URL:=https://codeload.github.com/containers/crun/tar.gz/$(PKG_VERSION)?
+PKG_HASH:=eb25a87da0b528bb09dc6a231a0d28eb4f287fc864d62bf9a46cc48e36010935
 
 PKG_BUILD_DEPENDS:=argp-standalone
 PKG_BUILD_PARALLEL:=1
@@ -18,6 +16,7 @@ PKG_INSTALL:=1
 PKG_MAINTAINER:=Oskari Rauta <oskari.rauta@gmail.com>
 PKG_LICENSE:=GPL-2.0-or-later
 PKG_LICENSE_FILES:=COPYING
+PKG_CPE_ID:=cpe:/a:crun_project:crun
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -26,12 +25,24 @@ define Package/crun
   CATEGORY:=Utilities
   TITLE:=crun
   URL:=https://github.com/containers/crun
-  DEPENDS:=@!arc +libseccomp +libcap
+  DEPENDS:=@!arc +libseccomp +libcap +libgcrypt
 endef
 
 define Package/crun/description
   A fast and low-memory footprint OCI Container Runtime fully written in C.
 endef
+
+LIBOCISPEC_COMMIT:=3d168261f250477061fe0eb3648bf998c70c6519
+
+define Download/libocispec
+  PROTO:=git
+  URL:=https://github.com/containers/libocispec.git
+  VERSION:=$(LIBOCISPEC_COMMIT)
+  MIRROR_HASH:=4e308ff6a40e38aee184abef9156fa92b1ea9f978e277be2ed7b12f9e06f717f
+  FILE:=libocispec-$(LIBOCISPEC_COMMIT).tar.xz
+  SUBDIR:=libocispec
+endef
+$(eval $(call Download,libocispec))
 
 CONFIGURE_ARGS+= \
 	--disable-systemd \
@@ -43,7 +54,8 @@ CONFIGURE_ARGS+= \
 
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	$(SED) '/#include <git-version.h>/d' $(PKG_BUILD_DIR)/src/crun.c
+	$(SED) '/#include <git-version.h>/d' $(PKG_BUILD_DIR)/src/{crun.c,libcrun/container.c}
+	xzcat $(DL_DIR)/libocispec-$(LIBOCISPEC_COMMIT).tar.xz | $(HOST_TAR) -C $(PKG_BUILD_DIR) $(TAR_OPTIONS)
 endef
 
 define Build/Configure

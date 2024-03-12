@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=chrony
-PKG_VERSION:=4.2
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=4.5
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://download.tuxfamily.org/chrony/
-PKG_HASH:=273f9fd15c328ed6f3a5f6ba6baec35a421a34a73bb725605329b1712048db9a
+PKG_SOURCE_URL:=https://chrony-project.org/releases/
+PKG_HASH:=19fe1d9f4664d445a69a96c71e8fdb60bcd8df24c73d1386e02287f7366ad422
 
 PKG_MAINTAINER:=Miroslav Lichvar <mlichvar0@gmail.com>
 PKG_LICENSE:=GPL-2.0
@@ -21,6 +21,7 @@ PKG_LICENSE_FILES:=COPYING
 PKG_CPE_ID:=cpe:/a:tuxfamily:chrony
 
 PKG_BUILD_DEPENDS:=pps-tools
+PKG_BUILD_FLAGS:=lto
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -53,9 +54,15 @@ define Package/chrony/description
 	An NTP client and server designed to perform well in a wide range
 	of conditions. It can synchronize the system clock with NTP servers,
 	reference clocks, and manual input using wristwatch and keyboard.
+	This package does NOT include NTS support.
 endef
 
-Package/chrony-nts/description = $(Package/chrony/description)
+define Package/chrony-nts/description
+	An NTP client and server designed to perform well in a wide range
+	of conditions. It can synchronize the system clock with NTP servers,
+	reference clocks, and manual input using wristwatch and keyboard.
+	This package includes NTS support.
+endef
 
 define Package/chrony/conffiles
 /etc/chrony/chrony.conf
@@ -79,14 +86,12 @@ CONFIGURE_ARGS+= \
 
 CONFIGURE_VARS+=CPPFLAGS=-DNDEBUG
 
-TARGET_CFLAGS += -flto
-TARGET_LDFLAGS += -flto
-
 define Package/chrony/install
 	$(INSTALL_DIR) $(1)/usr/bin/
 	$(INSTALL_DIR) $(1)/usr/sbin/
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/chronyd $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/chronyc $(1)/usr/bin
+	$(INSTALL_BIN) ./files/chrony.ntp-hotplug $(1)/usr/sbin/chrony-hotplug
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_DIR) $(1)/etc/chrony

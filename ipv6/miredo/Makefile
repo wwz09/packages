@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=miredo
 PKG_VERSION:=1.2.6
-PKG_RELEASE:=2
+PKG_RELEASE:=3
 
 PKG_SOURCE:=miredo-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=https://www.remlab.net/files/miredo/
@@ -14,6 +14,7 @@ PKG_CONFIG_DEPENDS:= \
 PKG_BUILD_PARALLEL:=1
 PKG_CHECK_FORMAT_SECURITY:=0
 PKG_INSTALL:=1
+PKG_BUILD_FLAGS:=gc-sections
 
 PKG_MAINTAINER:=
 PKG_LICENSE:=GPL-2.0-or-later
@@ -36,6 +37,10 @@ define Package/miredo/description
  IPv6 connectivity even from behind NAT devices.
 endef
 
+define Package/miredo/conffiles
+/etc/miredo/miredo.conf
+endef
+
 CONFIGURE_ARGS+= \
 	--enable-shared \
 	--enable-static \
@@ -48,11 +53,7 @@ CONFIGURE_VARS += \
 	ac_cv_header_sys_capability_h=no
 
 TARGET_CFLAGS+= \
-	$(FPIC) \
-	-ffunction-sections \
-	-fdata-sections
-
-TARGET_LDFLAGS += -Wl,--gc-sections
+	$(FPIC)
 
 define Package/miredo/install
 	$(INSTALL_DIR) $(1)/usr/lib

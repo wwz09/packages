@@ -5,22 +5,23 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=graphicsmagick
-PKG_VERSION:=1.3.35
-PKG_RELEASE:=3
+PKG_VERSION:=1.3.42
+PKG_RELEASE:=1
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/GraphicsMagick-$(PKG_VERSION)
-PKG_SOURCE:=GraphicsMagick-$(PKG_VERSION).tar.bz2
+PKG_SOURCE:=GraphicsMagick-$(PKG_VERSION).tar.xz
 PKG_SOURCE_URL:=@SF/graphicsmagick
-PKG_HASH:=7fd0b49903eb35df4ab5ca76139ab3f023f47485a4913fbdcf5c642c6e5f01fc
+PKG_HASH:=484fccfd2b2faf6c2ba9151469ece5072bcb91ba4ed73e75ed3d8e46c759d557
 
 PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=Copyright.txt
-PKG_MAINTAINER:=Val Kulkov <val.kulkov@gmail.com>
+PKG_MAINTAINER:=Aleksey Vasilenko <aleksey.vasilenko@gmail.com>
 PKG_CPE_ID:=cpe:/a:graphicsmagick:graphicsmagick
 
 PKG_BUILD_PARALLEL:=1
 DISABLE_NLS:=
 PKG_BUILD_DEPENDS:=zlib freetype libpng libjpeg-turbo tiff
+PKG_BUILD_FLAGS:=lto
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -73,8 +74,6 @@ CONFIGURE_ARGS += \
 	--without-zstd \
 	--without-x
 
-TARGET_CFLAGS += $(if $(CONFIG_GCC_USE_VERSION_10),,-flto)
-
 define Build/InstallDev
 	$(INSTALL_DIR) $(1)/usr/include
 	$(CP) \
@@ -101,4 +100,3 @@ define Package/graphicsmagick/install
 endef
 
 $(eval $(call BuildPackage,graphicsmagick))
-

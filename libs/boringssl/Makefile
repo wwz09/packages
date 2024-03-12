@@ -6,7 +6,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=boringssl
 PKG_VERSION:=20210608
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://boringssl.googlesource.com/boringssl
@@ -28,16 +28,14 @@ define Package/boringssl
 	CATEGORY:=Libraries
 	TITLE:=An implementation of the TLS protocol
 	URL:=https://boringssl.googlesource.com/boringssl/
-	DEPENDS:=+libatomic +libstdcpp $(GO_ARCH_DEPENDS) @!(mips||mips64)
+	DEPENDS:=+libstdcpp $(GO_ARCH_DEPENDS) @!(mips||mips64)
 endef
 
 define Package/boringssl/description
 	An implementation of the TLS protocol
 endef
 
-CMAKE_OPTIONS+= \
-	-DBUILD_SHARED_LIBS=ON \
-	-DCMAKE_EXE_LINKER_FLAGS="-latomic"
+CMAKE_OPTIONS+=-DBUILD_SHARED_LIBS=ON
 
 define Package/boringssl/install
 	$(INSTALL_DIR) $(1)/usr/lib/boringssl

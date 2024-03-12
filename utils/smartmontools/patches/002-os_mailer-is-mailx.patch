@@ -1,8 +1,6 @@
-diff --git a/configure b/configure
-index 88928cf..736fabd 100755
 --- a/configure
 +++ b/configure
-@@ -7633,7 +7633,7 @@ releaseversion='${PACKAGE}-${VERSION}'
+@@ -7682,7 +7682,7 @@ fi
  # Set platform-specific modules and symbols
  os_libs=
  os_dltools='curl wget lynx svn'

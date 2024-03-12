@@ -8,12 +8,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=pcsc-lite
-PKG_VERSION:=1.9.5
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=2.0.1
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
 PKG_SOURCE_URL:=https://pcsclite.apdu.fr/files/
-PKG_HASH:=9ee3f9b333537562177893559ad4f7b8d5c23ebe828eef53056c02db14049d08
+PKG_HASH:=5edcaf5d4544403bdab6ee2b5d6c02c6f97ea64eebf0825b8d0fa61ba417dada
 PKG_MAINTAINER:=Daniel Golle <daniel@makrotopia.org>
 PKG_LICENSE:=BSD-3-Clause
 PKG_LICENSE_FILES:=COPYING
@@ -70,6 +70,7 @@ CONFIGURE_ARGS += \
 	--disable-libudev \
 	--disable-libsystemd \
 	--enable-libusb \
+	--disable-polkit \
 	--enable-static \
 	--enable-ipcdir=/var/run/pcscd \
 	--enable-usbdropdir=/usr/lib/pcsc/drivers
